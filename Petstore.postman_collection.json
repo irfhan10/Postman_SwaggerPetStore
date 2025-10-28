@@ -1,0 +1,790 @@
+{
+	"info": {
+		"_postman_id": "f4372e21-8be2-4aeb-aa68-7f2492528599",
+		"name": "Petstore",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10228527"
+	},
+	"item": [
+		{
+			"name": "Positive Test Case",
+			"item": [
+				{
+					"name": "TC001 - Tambah pet baru",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// // Generate data random untuk chaining",
+									"// pm.collectionVariables.set(\"petName\", \"TestBuddy_\" + pm.variables.get(\"$randomInt\"));",
+									"// pm.collectionVariables.set(\"petId\", pm.variables.get(\"$randomInt\"));",
+									"",
+									"pm.collectionVariables.set(\"petId\", \"9999\");",
+									"pm.collectionVariables.set(\"petName\", \"TestPet\");"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion Status Code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Assertion Response Body",
+									"pm.test(\"Response body berisi data pet yang baru\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.name).to.eql(pm.collectionVariables.get(\"petName\"));",
+									"    pm.expect(jsonData.status).to.eql(\"available\");",
+									"});",
+									"",
+									"// Chaining, Simpan ID pet ke collection variable",
+									"var jsonData = pm.response.json();",
+									"pm.collectionVariables.set(\"petId\", jsonData.id);",
+									"console.log(\"Created pet with ID: \" + jsonData.id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": {{petId}},\n  \"category\": {\n    \"id\": 1,\n    \"name\": \"Kitty\"\n  },\n  \"name\": \"{{petName}}\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ],\n  \"status\": \"available\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pet",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC002 - Get detail pet yang sudah di-create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion Status Code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Assertion Response Body (var dari chaining)",
+									"pm.test(\"Response body sesuai dengan data pet yang di-create\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.id).to.eql(parseInt(pm.collectionVariables.get(\"petId\")));",
+									"    pm.expect(jsonData.name).to.eql(pm.collectionVariables.get(\"petName\"));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pet/{{petId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet",
+								"{{petId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC003 - Update status pet menjadi sold",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion Status Code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Assertion Response Body",
+									"pm.test(\"Response body menunjukkan status 'sold'\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"sold\");",
+									"    pm.expect(jsonData.id).to.eql(parseInt(pm.collectionVariables.get(\"petId\")));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": {{petId}},\n  \"category\": {\n    \"id\": 1,\n    \"name\": \"Dogs\"\n  },\n  \"name\": \"{{petName}}\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ],\n  \"status\": \"sold\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pet",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC004 - Verifikasi detail pet yang sudah di-update (sold)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion Status Code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Assertion Response Body (memvalidasi status 'sold')",
+									"pm.test(\"Status pet tervalidasi 'sold'\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"sold\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pet/{{petId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet",
+								"{{petId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC005 - Cari pet yang berstatus sold",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion Status Code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Assertion Response Body pet ada di list 'sold'",
+									"pm.test(\"Response body adalah array dan berisi pet 'sold'\", function () {",
+									"    // Pastikan response adalah array",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"",
+									"    // Cek ID pet yang sudah di-sold di TC003 ada di array ini",
+									"    var petFound = jsonData.some(pet => pet.id === parseInt(pm.collectionVariables.get(\"petId\")));",
+									"    pm.expect(petFound).to.be.true;",
+									"    ",
+									"    // Cek semua array harus berstatus 'sold'",
+									"    pm.expect(jsonData.every(pet => pet.status === 'sold')).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pet/findByStatus?status=sold",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet",
+								"findByStatus"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "sold"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC006 - Cari pet yang berstatus available",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion Status Code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response code 200 dan Response body adalah array\", function () {",
+									"    // Assertion Status Code",
+									"    pm.response.to.have.status(200);",
+									"",
+									"    // Assertion Response Body: Cek hasil array",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"    ",
+									"    // Cek semua pet di list ini berstatus 'available'",
+									"    if (jsonData.length > 0) {",
+									"        pm.expect(jsonData.every(pet => pet.status === 'available')).to.be.true;",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pet/findByStatus?status=available",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet",
+								"findByStatus"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "available"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC007 - Delete pet yang sudah di-update sold",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion Status Code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/pet/{{petId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet",
+								"{{petId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Negative Test Case",
+			"item": [
+				{
+					"name": "TC008 - Get pet dengan ID yang tidak ada",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion Status Code",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"// Assertion Response Body Pet not found",
+									"pm.test(\"Error message is 'Pet not found'\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.eql(\"Pet not found\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/pet/9999999999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet",
+								"9999999999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC009 - Get pet dengan ID yang tidak valid (string)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion Status Code",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"// Assertion Response Body Cek pesan error",
+									"pm.test(\"Response message berisi error format angka\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include(\"NumberFormatException\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/pet/abcde",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet",
+								"abcde"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC010 - Get pet yang sudah di hapus",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion Status Code",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"// Assertion Response Body",
+									"pm.test(\"Error message is 'Pet not found'\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.eql(\"Pet not found\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pet/{{petId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet",
+								"{{petId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC011 - Delete pet dengan ID yang tidak ada",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion Status Code",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/pet/99999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet",
+								"99999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC012 - Delete pet dengan ID yang tidak valid (string)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion Status Code",
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/pet/abcde",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet",
+								"abcde"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC013 - Update pet dengan body yang tidak valid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion Status Code",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pet",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC014 - Add pet dengan format JSON yang salah",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion Status Code",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 12345,\n    \"name\": \"TestPet\",\n    \"status\": \"available\"\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pet",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TC015 - Cari pet dengan status yang salah",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assertion Status Code",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Assertion Response Body array kosong",
+									"pm.test(\"Response body adalah array kosong\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array').that.is.empty;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/pet/findByStatus?status=kosong",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pet",
+								"findByStatus"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "kosong"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://petstore.swagger.io/v2"
+		},
+		{
+			"key": "petId",
+			"value": ""
+		},
+		{
+			"key": "petName",
+			"value": ""
+		},
+		{
+			"key": "apiKey",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
